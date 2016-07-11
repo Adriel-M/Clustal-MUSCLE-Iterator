@@ -43,21 +43,75 @@ def alignment_score(sequence_1, sequence_2, matrix, gap_open, gap_extension):
     :return: the pairwise score between these two sequences
     """
     score = 0.0
-    in_gap = False
+    first_in_gap = False
+    second_in_gap = False
     for position in range(len(sequence_1)):
         pair = (sequence_1[position], sequence_2[position])
-        if not in_gap:
-            if '-' in pair:
-                in_gap = True
-                score -= gap_open
+        # Both in gap
+        if first_in_gap and second_in_gap:
+            # Both gaps are extended
+            if pair == ("-", "-"):
+                score -= gap_extension
+                score -= gap_extension
+            # Only the first has a gap
+            elif pair[0] == "-":
+                score -= gap_extension
+                second_in_gap = False
+            # Only the second has a gap
+            elif pair[1] == "-":
+                score -= gap_extension
+                first_in_gap = False
+            # No more gaps
             else:
+                first_in_gap = False
+                second_in_gap = False
+                score += pair_score(pair, matrix)
+        elif first_in_gap:
+            # First gap is extended, open new gap in second
+            if pair == ("-", "-"):
+                score -= gap_open
+                score -= gap_extension
+                second_in_gap = True
+            # Only the first has a gap, first is extended
+            elif pair[0] == "-":
+                score -= gap_extension
+            # Only second has a gap, first gap closes
+            elif pair[1] == "-":
+                score -= gap_open
+                second_in_gap = True
+                first_in_gap = False
+            # No more gaps
+            else:
+                first_in_gap = False
+                score += pair_score(pair, matrix)
+        elif second_in_gap:
+            # Second gap is extended, open new gap in first
+            if pair == ("-", "-"):
+                score -= gap_open
+                score -= gap_extension
+                first_in_gap = True
+            # Only the first has a gap, second gap closes
+            elif pair[0] == "-":
+                score -= gap_open
+                first_in_gap = True
+                second_in_gap = False
+            # Only second has a gap, second is extended
+            elif pair[1] == "-":
+                score -= gap_extension
+            # No more gaps
+            else:
+                second_in_gap = False
                 score += pair_score(pair, matrix)
         else:
-            if '-' not in pair:
-                in_gap = False
-                score += pair_score(pair, matrix)
+            if '-' in pair:
+                if pair[0] == "-":
+                    first_in_gap = True
+                    score -= gap_open
+                if pair[1] == "-":
+                    second_in_gap = True
+                    score -= gap_extension
             else:
-                score -= gap_extension
+                score += pair_score(pair, matrix)
     return score
 
 
