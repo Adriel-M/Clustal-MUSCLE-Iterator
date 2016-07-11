@@ -19,10 +19,19 @@ def fasta_to_list(path_to_alignment):
 def pair_score(pair, matrix):
     """Return the score of a pair from a defined a substitution matrix.
 
+    Read for non standard amino acid labelling
+    http://www.matrixscience.com/blog/non-standard-amino-acid-residues.html
+
     :param pair: a tuple representation of the pair to check
     :param matrix: the substitution matrix used to score pairs
     :return: the score pertaining to the pair
     """
+    # For non standard amino acid labelling
+    # TODO: fully implement all the non standard labelling
+    if "J" == pair[0]:
+        pair = ('I', pair[1])
+    if "J" == pair[1]:
+        pair = (pair[0], 'I')
     # since A-C and C-A will have the same score, sometimes the substitution
     # matrix will only contain one of these two.
     if pair not in matrix:
