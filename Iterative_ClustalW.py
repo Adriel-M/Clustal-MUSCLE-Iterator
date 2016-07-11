@@ -8,7 +8,7 @@ def iterative_clustal(path_to_megacc, path_to_unaligned, min_gap_open,
                       max_gap_open, gap_open_interval, min_gap_extension,
                       max_gap_extension, gap_extension_interval,
                       substitution_matrix):
-    best_gap_open = []
+    best_gap_config = []
     best_score = 0
     current_gap_open = min_gap_open
     while current_gap_open <= max_gap_open:
@@ -24,30 +24,36 @@ def iterative_clustal(path_to_megacc, path_to_unaligned, min_gap_open,
                         ".mao", path_to_unaligned, "results/" +
                         config_name + ".fasta")
             alignments = fasta_to_list("results/" + config_name + ".fasta")
-            score = sum_of_pairs(alignments, substitution_matrix,
-                                 10, 0.1)
+            # default blastp is gap_open: 11, gap_extension: 1
+            score = sum_of_pairs(alignments, substitution_matrix, 11.0, 1.0)
             current_config = [current_gap_open, current_gap_extension]
             if score == best_score:
-                best_gap_open.append(current_config)
+                best_gap_config.append(current_config)
             elif score > best_score:
-                best_gap_open.clear()
+                best_gap_config.clear()
                 best_score = score
-                best_gap_open.append(current_config)
+                best_gap_config.append(current_config)
             current_gap_extension += gap_extension_interval
         current_gap_open += gap_open_interval
-    return best_gap_open
+    return best_gap_config
 
 
-def generate_config(config_name, gap_open, gap_extension):
+def generate_config(config_path, gap_open, gap_extension):
+    """Generate configuration of megacc
+
+    :param config_path: output config path
+    :param gap_open: the penalty for opening a gap
+    :param gap_extension: the penalty for extending a gap
+    """
     # check if file exists, if it does, don't generate a new config
-    if not os.path.isfile(config_name):
+    if not os.path.isfile(config_path):
         gap_open = float(gap_open)
         gap_extension = float(gap_extension)
         gap_open = "%.2f" % gap_open
         gap_extension = "%.2f" % gap_extension
         # Hardcoded for now.
         template = open("configuration/template/clustal_default.mao", "r")
-        config = open(config_name, "w")
+        config = open(config_path, "w")
         while True:
             line = template.readline()
             if not line:
@@ -70,6 +76,13 @@ def generate_config(config_name, gap_open, gap_extension):
 
 def run_clustal(path_to_megacc, configuration_path, unaligned_sequences,
                 output_path):
+    """Runs clustal
+
+    :param path_to_megacc: file path to megacc program
+    :param configuration_path: file path to megacc alignment configuration
+    :param unaligned_sequences: a collection of unaligned sequences
+    :param output_path: file path to output the results
+    """
     command_to_run = [path_to_megacc, "-a", configuration_path, "-d",
                       unaligned_sequences, "-f", "Fasta", "-o", output_path]
     subprocess.call(command_to_run)

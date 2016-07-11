@@ -38,8 +38,8 @@ def alignment_score(sequence_1, sequence_2, matrix, gap_open, gap_extension):
     :param sequence_1: one of the sequence to compare
     :param sequence_2: the other sequence to compare
     :param matrix: the substitution matrix used to score pairs
-    :param gap_open: the penalty for extending a gap
-    :param gap_extension: the sum of pair scores for this alignment
+    :param gap_open: the penalty for opening a gap
+    :param gap_extension: the penalty for extending a gap
     :return: the pairwise score between these two sequences
     """
     score = 0.0
