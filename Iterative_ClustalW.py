@@ -9,12 +9,12 @@ def iterative_clustal(path_to_megacc, path_to_unaligned, min_gap_open,
                       max_gap_extension, gap_extension_interval,
                       substitution_matrix):
     best_config = []
-    best_score = 0
+    best_score = None
     current_gap_open = min_gap_open
     while current_gap_open <= max_gap_open:
         formatted_gap_open = "%.2f" % current_gap_open
         current_gap_extension = min_gap_extension
-        best_gap_extension_score = 0
+        best_gap_extension_score = None
         best_gap_extension_config = []
         while current_gap_extension <= max_gap_extension:
             formatted_gap_extension = "%.2f" % current_gap_extension
@@ -30,6 +30,9 @@ def iterative_clustal(path_to_megacc, path_to_unaligned, min_gap_open,
             score = sum_of_pairs(alignments, substitution_matrix, 11.0, 1.0)
             print(score)
             current_config = [current_gap_open, current_gap_extension]
+            if best_gap_extension_score is None:
+                best_gap_extension_score = score
+                best_gap_extension_config.append(current_config)
             if score == best_gap_extension_score:
                 best_gap_extension_config.append(current_config)
             elif score > best_gap_extension_score:
@@ -39,6 +42,9 @@ def iterative_clustal(path_to_megacc, path_to_unaligned, min_gap_open,
             else:
                 break
             current_gap_extension += gap_extension_interval
+        if best_score is None:
+            best_score = best_gap_extension_score
+            best_config.append(best_gap_extension_config)
         if best_score == best_gap_extension_score:
             best_config.extend(best_gap_extension_config)
         elif best_gap_extension_score > best_score:
