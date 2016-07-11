@@ -1,5 +1,6 @@
 from Sum_of_Pairs import *
 from Bio.SubsMat import MatrixInfo
+import os
 import subprocess
 
 
@@ -38,29 +39,33 @@ def iterative_clustal(path_to_megacc, path_to_unaligned, min_gap_open,
 
 
 def generate_config(config_name, gap_open, gap_extension):
-    gap_open = float(gap_open)
-    gap_extension = float(gap_extension)
-    gap_open = "%.2f" % gap_open
-    gap_extension = "%.2f" % gap_extension
-    # Hardcoded for now.
-    template = open("configuration/template/clustal_default.mao", "r")
-    config = open(config_name, "w")
-    while True:
-        line = template.readline()
-        if not line:
-            break
-        if "Penalty" in line:
-            if "ProteinPWGapOpeningPenalty" in line:
-                config.write("ProteinPWGapOpeningPenalty   = " + gap_open)
-            elif "ProteinMAGapOpeningPenalty" in line:
-                config.write("ProteinMAGapOpeningPenalty   = " + gap_open)
-            elif "ProteinPWGapExtensionPenalty" in line:
-                config.write("ProteinPWGapExtensionPenalty = " + gap_extension)
-            elif "ProteinMAGapExtensionPenalty" in line:
-                config.write("ProteinMAGapExtensionPenalty = " + gap_extension)
-            config.write("\n")
-        else:
-            config.write(line)
+    # check if file exists, if it does, don't generate a new config
+    if not os.path.isfile(config_name):
+        gap_open = float(gap_open)
+        gap_extension = float(gap_extension)
+        gap_open = "%.2f" % gap_open
+        gap_extension = "%.2f" % gap_extension
+        # Hardcoded for now.
+        template = open("configuration/template/clustal_default.mao", "r")
+        config = open(config_name, "w")
+        while True:
+            line = template.readline()
+            if not line:
+                break
+            if "Penalty" in line:
+                if "ProteinPWGapOpeningPenalty" in line:
+                    config.write("ProteinPWGapOpeningPenalty   = " + gap_open)
+                elif "ProteinMAGapOpeningPenalty" in line:
+                    config.write("ProteinMAGapOpeningPenalty   = " + gap_open)
+                elif "ProteinPWGapExtensionPenalty" in line:
+                    config.write("ProteinPWGapExtensionPenalty = " +
+                                 gap_extension)
+                elif "ProteinMAGapExtensionPenalty" in line:
+                    config.write("ProteinMAGapExtensionPenalty = " +
+                                 gap_extension)
+                config.write("\n")
+            else:
+                config.write(line)
 
 
 def run_clustal(path_to_megacc, configuration_path, unaligned_sequences,
