@@ -34,7 +34,7 @@ def iterative_clustal(path_to_megacc, path_to_unaligned, min_gap_open,
             if best_gap_extension_score is None:
                 best_gap_extension_score = score
                 best_gap_extension_config.append(current_config)
-            if score == best_gap_extension_score:
+            elif score == best_gap_extension_score:
                 best_gap_extension_config.append(current_config)
             elif score > best_gap_extension_score:
                 best_gap_extension_config.clear()
