@@ -7,7 +7,8 @@ import subprocess
 def iterative_clustal(path_to_megacc, path_to_unaligned, min_gap_open,
                       max_gap_open, gap_open_interval, min_gap_extension,
                       max_gap_extension, gap_extension_interval,
-                      substitution_matrix):
+                      substitution_matrix, score_gap_open,
+                      score_gap_extension):
     best_config = []
     best_score = None
     current_gap_open = min_gap_open
@@ -27,8 +28,8 @@ def iterative_clustal(path_to_megacc, path_to_unaligned, min_gap_open,
                         config_name + ".fasta")
             alignments = fasta_to_list("results/" + config_name + ".fasta")
             # default blastp is gap_open: 11, gap_extension: 1
-            score = sum_of_pairs(alignments, substitution_matrix, 11.0, 1.0)
-            print(score)
+            score = sum_of_pairs(alignments, substitution_matrix,
+                                 score_gap_open, score_gap_extension)
             current_config = [current_gap_open, current_gap_extension]
             if best_gap_extension_score is None:
                 best_gap_extension_score = score
@@ -105,6 +106,6 @@ def run_clustal(path_to_megacc, configuration_path, unaligned_sequences,
     subprocess.call(command_to_run)
 
 if __name__ == "__main__":
-    best = iterative_clustal("mega/megacc", "example/lol.fas", 2.0, 10.0, 1.0,
-                             0.10, 2.0, 0.10, MatrixInfo.blosum62)
+    best = iterative_clustal("mega/megacc", "example/lab.fas", 2.0, 10.0, 1.0,
+                             0.10, 1.5, 0.10, MatrixInfo.blosum62, 11.0, 1.0)
     print(best)
