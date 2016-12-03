@@ -1,3 +1,9 @@
+# Do not use
+
+The clustal algorithm is not as good as the other algorithms (MUSCLE, MAFFT, etc). This was just a side project to find out if the best pairwise score from clustal is anything comparable to the other algorithms. Comparable in the sense of pairwise scores and physiological plausibility.
+
+Also not done.
+
 # Clustal-MUSCLE-Iterator
 
 A script to iterate through the parameters of Clustal/MUSCLE to generate the best sum of pair score.
